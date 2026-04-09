@@ -1,0 +1,17 @@
+langchain
+langchain-community
+langchain-core
+langchain-ollama
+langchain-chroma
+langchain-huggingface
+chromadb
+sentence-transformers
+pypdf
+unstructured
+beautifulsoup4
+requests
+tqdm
+rank-bm25
+streamlit
+ollama
+python-dotenv
