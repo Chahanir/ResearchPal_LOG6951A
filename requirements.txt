@@ -15,3 +15,12 @@ rank-bm25
 streamlit
 ollama
 python-dotenv
+langgraph
+langgraph-checkpoint-sqlite
+duckduckgo-search
+arize-phoenix
+openinference-instrumentation-langchain
+opentelemetry-sdk
+opentelemetry-exporter-otlp
+ragas
+datasets
