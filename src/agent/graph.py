@@ -1,19 +1,3 @@
-"""
-T1 + T2 — Graphe LangGraph avec Corrective RAG (ResearchPal v2).
-
-CORRECTION v2 : Les outils @tool sont maintenant correctement liés au LLM via
-`llm.bind_tools(TOOLS)` et exécutés via un `ToolNode` LangGraph standard.
-C'est le pattern enseigné dans le cours (slide 10 : model.bind_tools([...])).
-
-Architecture :
-
-  START → route_question ──(tool_call?)──► execute_tools ──(web?)──► generate
-                │                                                        ▲
-                └──(no tool_call)──► retrieve ──► grade_documents ──────┤
-                                          ▲              │          "relevant"
-                                          │         "not_relevant"
-                                          └── rewrite_query (max 3 cycles)
-"""
 from __future__ import annotations
 
 import json
@@ -32,10 +16,7 @@ from src.agent.tools import TOOLS
 
 MAX_RETRIES = 3
 
-# ---------------------------------------------------------------------------
 # LLM instances
-# ---------------------------------------------------------------------------
-
 _llm_with_tools = None
 _llm_plain = None
 
@@ -57,10 +38,7 @@ def get_llm_plain():
     return _llm_plain
 
 
-# ---------------------------------------------------------------------------
 # System prompt
-# ---------------------------------------------------------------------------
-
 def get_system_prompt() -> str:
     episodic = build_episodic_prompt()
     return f"""You are ResearchPal v2, a rigorous research assistant.
@@ -78,10 +56,7 @@ def get_system_prompt() -> str:
     {episodic}"""
 
 
-# ---------------------------------------------------------------------------
-# Nœud 1 : route_question
-# Le LLM avec bind_tools décide lui-même s'il émet un tool_call
-# ---------------------------------------------------------------------------
+# Nœud 1 : LLM décide lui-même s'il émet un tool_call ou répond directement
 
 def route_question_node(state: AgentState) -> AgentState:
     """
@@ -100,12 +75,7 @@ def route_question_node(state: AgentState) -> AgentState:
     return {**state, "messages": messages + [response]}
 
 
-# ---------------------------------------------------------------------------
-# ToolNode — exécution standard des outils (pattern LangGraph cours)
-# ---------------------------------------------------------------------------
-
-# ToolNode lit les tool_calls du dernier AIMessage, exécute les @tool,
-# retourne les résultats comme ToolMessages dans state["messages"]
+# ToolNode lit les tool_calls du dernier AIMessage, exécute les outils,
 _tool_node = ToolNode(TOOLS)
 
 
@@ -137,10 +107,7 @@ def execute_tools_node(state: AgentState) -> AgentState:
     return {**state, "messages": new_messages, "web_results": web_results, "tool_used": tool_used}
 
 
-# ---------------------------------------------------------------------------
-# Nœud 2 : retrieve — récupération ChromaDB
-# ---------------------------------------------------------------------------
-
+# Nœud 2 : récupération depuis ChromaDB (si pas de résultat web pertinent)
 def retrieve_node(state: AgentState) -> AgentState:
     """Récupère les passages pertinents depuis ChromaDB."""
     from src.ingestion.indexer import get_vectorstore
@@ -156,10 +123,7 @@ def retrieve_node(state: AgentState) -> AgentState:
     }
 
 
-# ---------------------------------------------------------------------------
-# Nœud 3 : grade_documents — LLM-as-grader (Corrective RAG)
-# ---------------------------------------------------------------------------
-
+# Nœud 3 : grading de la pertinence des documents
 def grade_documents_node(state: AgentState) -> AgentState:
     """
     Évalue la pertinence des documents récupérés.
@@ -169,7 +133,7 @@ def grade_documents_node(state: AgentState) -> AgentState:
     documents = state.get("documents", [])
     question = state["question"]
 
-    # Résultats web disponibles → pertinent par définition
+    # Résultats web disponibles : grade directement sans LLM 
     if web_results and "AUCUN" not in web_results and "ERREUR" not in web_results:
         return {**state, "grade": "relevant"}
 
@@ -195,10 +159,7 @@ Réponds UNIQUEMENT : "relevant" ou "not_relevant".""")])
     return {**state, "grade": grade}
 
 
-# ---------------------------------------------------------------------------
-# Nœud 4 : rewrite_query
-# ---------------------------------------------------------------------------
-
+# Nœud 4 : reformulation de la question après échec du grading
 def rewrite_query_node(state: AgentState) -> AgentState:
     """Reformule la question et incrémente retry_count (garde-fou MAX_RETRIES)."""
     retry_count = state.get("retry_count", 0) + 1
@@ -215,10 +176,8 @@ Réponds UNIQUEMENT avec la question reformulée.""")])
     return {**state, "rewritten_question": rewritten, "retry_count": retry_count, "grade": grade}
 
 
-# ---------------------------------------------------------------------------
-# Nœud 5 : generate
-# ---------------------------------------------------------------------------
-
+# 
+# Nœud 5 : génération de la réponse finale avec le contexte (corpus ou web)
 def generate_node(state: AgentState) -> AgentState:
     """Génère la réponse finale avec le contexte (corpus ou web)."""
     llm = get_llm_plain()
@@ -251,11 +210,8 @@ def generate_node(state: AgentState) -> AgentState:
     ])
     return {**state, "generation": response.content}
 
-
-# ---------------------------------------------------------------------------
-# Arêtes conditionnelles
-# ---------------------------------------------------------------------------
-
+ 
+# Décisions conditionnelles pour les edges du graphe
 def decide_after_route(state: AgentState) -> Literal["execute_tools", "retrieve"]:
     """Si le LLM a émis un tool_call → ToolNode, sinon → retrieve."""
     messages = state.get("messages", [])
@@ -280,10 +236,7 @@ def decide_after_grading(state: AgentState) -> Literal["generate", "rewrite_quer
     return "rewrite_query"
 
 
-# ---------------------------------------------------------------------------
 # Construction du graphe
-# ---------------------------------------------------------------------------
-
 def build_graph(use_checkpointer: bool = True):
     """Construit et compile le graphe LangGraph ResearchPal v2."""
     builder = StateGraph(AgentState)
@@ -321,10 +274,7 @@ def build_graph(use_checkpointer: bool = True):
     return builder.compile()
 
 
-# ---------------------------------------------------------------------------
-# Fonction d'invocation haut niveau
-# ---------------------------------------------------------------------------
-
+# Fonction d'exécution du graphe
 def run_agent(question: str, thread_id: str = "default", graph=None) -> dict:
     if graph is None:
         graph = build_graph()

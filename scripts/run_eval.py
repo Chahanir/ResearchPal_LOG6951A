@@ -1,17 +1,3 @@
-"""
-T5 — Script de lancement de l'évaluation complète.
-
-Lance successivement :
-  1. Collecte des outputs du pipeline agentique (15 paires)
-  2. Évaluation RAGAS (faithfulness + answer_relevancy)
-  3. LLM-as-judge (citation_quality)
-  4. Génération du rapport final dans eval/rapport_evaluation.md
-
-Usage :
-    python -m src.evaluation.run_eval
-    # ou depuis la racine du projet :
-    python scripts/run_eval.py
-"""
 from __future__ import annotations
 
 import json
@@ -36,20 +22,20 @@ def run_full_evaluation():
 
     print_dataset_summary()
 
-    # Étape 1 — Construire le graphe
+    # Étape 1 : Construire le graphe
     print("\n📦 Construction du graphe LangGraph...")
     graph = build_graph(use_checkpointer=False)
 
-    # Étape 2 — Collecter les outputs
+    # Étape 2 : Collecter les outputs
     questions, answers, contexts, ground_truths = collect_pipeline_outputs(graph)
 
-    # Étape 3 — RAGAS
+    # Étape 3 : RAGAS
     ragas_scores = run_ragas_evaluation(questions, answers, contexts, ground_truths)
 
-    # Étape 4 — LLM-as-judge
+    # Étape 4 : LLM-as-judge
     judge_results = run_llm_judge_evaluation(questions, answers, contexts)
 
-    # Étape 5 — Rapport final
+    # Étape 5 : Rapport final
     _generate_report(EVAL_DATASET, questions, answers, ragas_scores, judge_results)
 
     print("\n✅ Évaluation terminée. Rapport : eval/rapport_evaluation.md")

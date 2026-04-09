@@ -1,35 +1,3 @@
-"""
-T3 — Mémoire agentique ResearchPal v2.
-
-Niveau 1 — Mémoire court terme :
-    Checkpointer SQLite (LangGraph) qui persiste l'état du thread entre
-    les appels et même après redémarrage du processus Python.
-
-Niveau 2 — Mémoire long terme (Option B — Mémoire épisodique) :
-    Les 5 meilleures résolutions de requêtes complexes sont stockées dans un
-    fichier JSON persistant (`memory/episodic_memory.json`).
-    Ces exemples sont injectés comme few-shot dans le system prompt au démarrage
-    de chaque nouvelle session, améliorant la cohérence des réponses futures.
-
-Justification du choix de l'Option B :
-    ResearchPal est un assistant de recherche. Les requêtes complexes (multi-hop,
-    adversariales) sont les plus coûteuses à résoudre. Les mémoriser comme exemples
-    few-shot permet à l'agent d'apprendre de ses succès passés sans ré-exécuter le
-    pipeline complet. Contrairement au cache sémantique (Option A), la mémoire
-    épisodique généralise mieux : elle n'exige pas une quasi-similarité exacte entre
-    la requête courante et le souvenir, mais offre un guidage de style et de format.
-    L'Option C (préférences utilisateur) est plus adaptée aux assistants personnels
-    généraux ; ResearchPal a un domaine ciblé où la qualité de raisonnement prime.
-
-Limites observées :
-    - La sélection des "meilleures" résolutions est heuristique (score RAGAS ou
-      longueur de réponse comme proxy). Un vrai critère de qualité nécessiterait
-      RAGAS en temps réel, ce qui alourdit le pipeline.
-    - Les 5 exemples few-shot augmentent le contexte d'environ 1 000 tokens par
-      session, ce qui peut dépasser la fenêtre de certains LLM locaux légers.
-    - La mémoire épisodique n'expire pas automatiquement : elle peut devenir
-      obsolète si le corpus est entièrement remplacé.
-"""
 from __future__ import annotations
 
 import json
@@ -37,10 +5,6 @@ import os
 import time
 from pathlib import Path
 from typing import Any, Dict, List, Optional
-
-# ---------------------------------------------------------------------------
-# Chemins
-# ---------------------------------------------------------------------------
 
 MEMORY_DIR = Path(__file__).parent.parent.parent / "memory"
 EPISODIC_FILE = MEMORY_DIR / "episodic_memory.json"
@@ -51,9 +15,7 @@ MEMORY_DIR.mkdir(parents=True, exist_ok=True)
 MAX_EPISODIC_ENTRIES = 5  # Stocker uniquement les N meilleures résolutions
 
 
-# ---------------------------------------------------------------------------
-# Niveau 1 — Mémoire court terme : checkpointer SQLite
-# ---------------------------------------------------------------------------
+# Niveau 1 : Mémoire à court terme => checkpointer du graphe (Option A)
 
 def get_checkpointer():
     """
@@ -75,9 +37,7 @@ def get_checkpointer():
         return MemorySaver()
 
 
-# ---------------------------------------------------------------------------
-# Niveau 2 — Mémoire long terme : mémoire épisodique (Option B)
-# ---------------------------------------------------------------------------
+# Niveau 2 : Mémoire à long terme => mémoire épisodique de résolutions réussies (Option B)
 
 def load_episodic_memory() -> List[Dict[str, Any]]:
     """Charge les exemples épisodiques depuis le fichier JSON persistant."""

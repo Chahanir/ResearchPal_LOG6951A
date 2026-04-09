@@ -1,27 +1,11 @@
-"""
-T5 — Dataset d'évaluation ResearchPal v2.
-
-15 paires question-réponse de référence :
-  - 10 paires issues du corpus (Washington Capitals)
-  - 3 paires adversariales (hors corpus, ambiguës, pièges à hallucination)
-  - 2 paires multi-hop (nécessitent de combiner deux passages distincts)
-
-Format : liste de dicts avec les clés :
-  - question        : question de l'utilisateur
-  - reference       : réponse de référence attendue
-  - context_hint    : indice sur le passage source (pour le retrieval)
-  - category        : "corpus" | "adversarial" | "multi_hop"
-"""
 
 EVAL_DATASET = [
-    # -----------------------------------------------------------------------
-    # CATÉGORIE : corpus (10 paires)
-    # -----------------------------------------------------------------------
+
     {
         "id": "C01",
         "category": "corpus",
         "question": "Combien de buts Alexander Ovechkin a-t-il marqués lors de la saison 2024-25 ?",
-        "reference": "Alexander Ovechkin a marqué 22 buts lors de la saison 2024-25 des Washington Capitals.",
+        "reference": "Alexander Ovechkin a marqué 44 buts lors de la saison 2024-25 des Washington Capitals.",
         "context_hint": "Ovechkin statistiques 2024-25",
     },
     {
@@ -84,12 +68,10 @@ EVAL_DATASET = [
         "id": "C10",
         "category": "corpus",
         "question": "Combien d'assistances Dylan Strome a-t-il réalisées lors de la saison 2024-25 ?",
-        "reference": "Dylan Strome a enregistré des statistiques notables lors de la saison 2024-25 des Washington Capitals.",
+        "reference": "Dylan Strome a enregistré 53 assistances lors de la saison 2024-25 des Washington Capitals.",
         "context_hint": "Strome assistances statistiques 2024-25",
     },
-    # -----------------------------------------------------------------------
-    # CATÉGORIE : adversarial (3 paires — pièges à hallucination)
-    # -----------------------------------------------------------------------
+    # CATÉGORIE : adversarial (3 paires : pièges à hallucination)
     {
         "id": "A01",
         "category": "adversarial",
@@ -111,9 +93,8 @@ EVAL_DATASET = [
         "reference": "Les documents indexés ne contiennent pas d'information sur la retraite d'Ovechkin ni sur son successeur. Selon les sources disponibles, Ovechkin est toujours actif.",
         "context_hint": "retraite Ovechkin successeur hors corpus",
     },
-    # -----------------------------------------------------------------------
-    # CATÉGORIE : multi_hop (2 paires — combiner 2 passages distincts)
-    # -----------------------------------------------------------------------
+
+    # CATÉGORIE : multi_hop (2 paires : combiner 2 passages distincts)
     {
         "id": "M01",
         "category": "multi_hop",

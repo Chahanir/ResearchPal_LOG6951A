@@ -1,13 +1,3 @@
-"""
-T2 — Outils personnalisés pour l'agent ResearchPal v2.
-
-Deux outils obligatoires :
-  1. search_corpus  — wrapping du retriever ChromaDB du TP1
-  2. search_web     — recherche DuckDuckGo (gratuit, sans clé API)
-
-Les descriptions sont volontairement précises : elles indiquent QUAND utiliser
-l'outil, QUAND ne pas l'utiliser, et le FORMAT de retour attendu.
-"""
 from __future__ import annotations
 
 import json
@@ -15,17 +5,13 @@ from typing import Optional
 
 from langchain_core.tools import tool
 
-# ---------------------------------------------------------------------------
-# Outil 1 — Recherche dans le corpus indexé (ChromaDB)
-# ---------------------------------------------------------------------------
-
+# Outil 1 : Recherche dans le corpus indexé (ChromaDB)
 @tool
 def search_corpus(query: str, k: int = 4) -> str:
     """Recherche des passages pertinents dans le corpus de documents indexés (ChromaDB).
 
     QUAND utiliser cet outil :
-    - La question porte sur le contenu des documents ingérés (Washington Capitals,
-      statistiques de joueurs, camp de développement, Alexander Ovechkin, etc.).
+    - La question porte sur le contenu des documents ingérés 
     - L'utilisateur demande une information factuelle tirée du corpus local.
     - La question contient des termes comme « selon le document », « dans les sources »,
       « d'après les fichiers indexés ».
@@ -67,9 +53,7 @@ def search_corpus(query: str, k: int = 4) -> str:
         return f"ERREUR_CORPUS: {str(e)}"
 
 
-# ---------------------------------------------------------------------------
-# Outil 2 — Recherche web DuckDuckGo
-# ---------------------------------------------------------------------------
+# Outil 2 : Recherche web DuckDuckGo
 
 @tool
 def search_web(query: str, max_results: int = 3) -> str:
@@ -122,9 +106,6 @@ def search_web(query: str, max_results: int = 3) -> str:
         return f"ERREUR_WEB: {str(e)}"
 
 
-# ---------------------------------------------------------------------------
 # Liste exportée pour le graphe LangGraph
-# ---------------------------------------------------------------------------
-
 TOOLS = [search_corpus, search_web]
 TOOLS_BY_NAME = {t.name: t for t in TOOLS}

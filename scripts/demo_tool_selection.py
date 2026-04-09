@@ -1,14 +1,3 @@
-"""
-T2 — Démonstration de la sélection dynamique d'outils.
-
-L'agent sélectionne le bon outil selon le type de requête sur 3 exemples contrastés :
-  1. Requête corpus  → search_corpus
-  2. Requête hors-corpus (web) → search_web
-  3. Requête mixte → corpus + web
-
-Usage :
-    python scripts/demo_tool_selection.py
-"""
 from __future__ import annotations
 
 import sys
@@ -25,7 +14,7 @@ def demo():
     print("  T2 — Démonstration de la sélection dynamique d'outils")
     print("=" * 65)
 
-    # Optionnel : démarrer Phoenix pour tracer
+    # démarrer Phoenix pour tracer
     # setup_phoenix()
 
     graph = build_graph(use_checkpointer=False)

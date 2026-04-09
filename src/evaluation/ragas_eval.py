@@ -1,15 +1,3 @@
-"""
-T5 — Évaluation qualité avec RAGAS.
-
-Calcule faithfulness et answer_relevance sur les 15 paires du dataset.
-Génère un rapport JSON + tableau markdown dans eval/ragas_results.json.
-
-Usage :
-    python -m src.evaluation.ragas_eval
-
-Prérequis :
-    pip install ragas
-"""
 from __future__ import annotations
 
 import json

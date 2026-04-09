@@ -1,12 +1,3 @@
-"""
-Interface Streamlit — ResearchPal v2 (TP2).
-
-Réutilise l'interface du TP1 et l'enrichit avec :
-  - Affichage du graphe LangGraph (nœuds, cycles, outils utilisés)
-  - Indicateurs agentiques : outil utilisé, nombre de retries, grade
-  - Mémoire : persistance de session via thread_id
-  - Lien vers Phoenix (http://localhost:6006)
-"""
 import sys
 import os
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../..")))
@@ -16,18 +7,14 @@ import uuid
 
 import streamlit as st
 
-# ---------------------------------------------------------------------------
-# Configuration de la page
-# ---------------------------------------------------------------------------
 st.set_page_config(
-    page_title="ResearchPal v2 — RAG Agentique",
+    page_title="ResearchPal v2",
     page_icon="🤖",
     layout="wide",
 )
 
-# ---------------------------------------------------------------------------
+
 # Initialisation de la session Streamlit
-# ---------------------------------------------------------------------------
 if "thread_id" not in st.session_state:
     st.session_state.thread_id = str(uuid.uuid4())[:8]
 
@@ -42,9 +29,7 @@ if "graph" not in st.session_state:
 if "phoenix_active" not in st.session_state:
     st.session_state.phoenix_active = False
 
-# ---------------------------------------------------------------------------
 # Sidebar
-# ---------------------------------------------------------------------------
 with st.sidebar:
     st.title("⚙️ ResearchPal v2")
     st.caption("Pipeline RAG Agentique — LOG6951A TP2")
@@ -117,10 +102,8 @@ with st.sidebar:
         for e in episodes:
             st.caption(f"• {e['question'][:50]}... (score: {e['quality_score']:.2f})")
 
-# ---------------------------------------------------------------------------
 # Zone principale
-# ---------------------------------------------------------------------------
-st.title("🤖 ResearchPal v2 — RAG Agentique")
+st.title("🤖 ResearchPal v2")
 st.caption(
     "Powered by LangGraph + Corrective RAG | "
     "Outils : search_corpus + search_web | "

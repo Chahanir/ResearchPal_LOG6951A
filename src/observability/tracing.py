@@ -1,20 +1,3 @@
-"""
-T4 — Observabilité et tracing avec Arize Phoenix.
-
-Phoenix est démarré en mode local (aucun compte cloud, aucune clé API).
-Il expose une interface web sur http://localhost:6006.
-
-Chaque nœud LangGraph génère un span nommé automatiquement via
-l'instrumentation OpenInference + OpenTelemetry.
-
-Métriques capturées par span :
-  - Latence totale de la requête (span racine)
-  - Latence par nœud (retrieve, grade_documents, rewrite_query, generate,
-    route_tool, call_tool)
-  - Tokens consommés par appel LLM (via callback OpenAI-compatible)
-  - Nombre d'itérations du cycle correctif (retry_count dans les attributs)
-  - Temps d'exécution des appels d'outils (span "tool_call")
-"""
 from __future__ import annotations
 
 import functools
@@ -22,9 +5,7 @@ import time
 from contextlib import contextmanager
 from typing import Any, Callable, Dict, Optional
 
-# ---------------------------------------------------------------------------
-# Initialisation Phoenix (local, sans compte cloud)
-# ---------------------------------------------------------------------------
+# Initialisation locale Phoenix
 
 _phoenix_session = None
 _tracer = None
@@ -76,9 +57,7 @@ def get_tracer():
     return _tracer
 
 
-# ---------------------------------------------------------------------------
-# Décorateur de span pour instrumenter manuellement les nœuds LangGraph
-# ---------------------------------------------------------------------------
+# Décorateurs et context managers pour les nœuds LangGraph 
 
 @contextmanager
 def node_span(name: str, attributes: Optional[Dict[str, Any]] = None):
@@ -129,10 +108,8 @@ def instrument_node(node_name: str):
     return decorator
 
 
-# ---------------------------------------------------------------------------
-# Helper : log d'une session complète (pour le rapport)
-# ---------------------------------------------------------------------------
 
+# logs de session pour le rapport
 def log_session_summary(session_id: str, queries: list, total_ms: float) -> None:
     """Affiche un résumé de session pour le rapport (traces/ dossier)."""
     print(f"\n📊 SESSION {session_id}")

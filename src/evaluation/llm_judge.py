@@ -1,19 +1,3 @@
-"""
-T5 — LLM-as-judge : évaluateur de qualité de citations de sources.
-
-Critère évalué : QUALITÉ DES CITATIONS DE SOURCES
-(critère complémentaire non couvert par RAGAS faithfulness/relevancy)
-
-Le prompt d'évaluation est structuré avec :
-  - Des critères explicites
-  - Un barème de notation [0-3]
-  - Un format de sortie JSON strict
-
-Usage :
-    python -m src.evaluation.llm_judge
-
-Le prompt complet est reproduit en commentaire ci-dessous (requis par l'énoncé).
-"""
 from __future__ import annotations
 
 import json
@@ -23,53 +7,6 @@ from typing import Dict, List, Any
 
 EVAL_OUTPUT_DIR = Path(__file__).parent.parent.parent / "eval"
 EVAL_OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
-
-# ---------------------------------------------------------------------------
-# PROMPT D'ÉVALUATION LLM-AS-JUDGE (inclus en annexe selon l'énoncé)
-# ---------------------------------------------------------------------------
-#
-# SYSTEM_JUDGE_PROMPT :
-# """
-# Tu es un évaluateur expert en qualité des réponses de systèmes RAG.
-# Ta mission est d'évaluer la QUALITÉ DES CITATIONS DE SOURCES dans une réponse.
-#
-# Critères d'évaluation — Qualité des citations :
-# 1. PRÉSENCE : La réponse cite-t-elle explicitement ses sources ?
-# 2. PRÉCISION : Les sources citées correspondent-elles aux passages réellement utilisés ?
-# 3. FORMAT : Les citations suivent-elles un format cohérent et lisible ?
-# 4. HONNÊTETÉ : La réponse admet-elle clairement quand aucune source n'est disponible ?
-#
-# Barème :
-#   3 — Excellent : Sources citées précisément, format cohérent, honnêteté parfaite
-#   2 — Bon       : Sources citées mais imprécises ou format inconsistant
-#   1 — Faible    : Citations partielles ou trompeuses
-#   0 — Absent    : Aucune citation, ou citations inventées
-#
-# Format de sortie OBLIGATOIRE (JSON strict, aucun texte avant ou après) :
-# {
-#   "score": <entier 0-3>,
-#   "reasoning": "<explication en 2-3 phrases>",
-#   "citation_present": <true|false>,
-#   "citation_accurate": <true|false>,
-#   "admits_ignorance_correctly": <true|false>
-# }
-# """
-#
-# USER_JUDGE_PROMPT :
-# """
-# Question posée : {question}
-#
-# Contexte fourni au système (passages récupérés) :
-# {context}
-#
-# Réponse générée par le système RAG :
-# {answer}
-#
-# Évalue la qualité des citations de sources dans cette réponse selon les critères.
-# Réponds UNIQUEMENT avec le JSON demandé.
-# """
-#
-# ---------------------------------------------------------------------------
 
 SYSTEM_JUDGE_PROMPT = """Tu es un évaluateur expert en qualité des réponses de systèmes RAG.
 Ta mission est d'évaluer la QUALITÉ DES CITATIONS DE SOURCES dans une réponse.
