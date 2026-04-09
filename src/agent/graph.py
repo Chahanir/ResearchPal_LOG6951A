@@ -43,16 +43,18 @@ def get_system_prompt() -> str:
     episodic = build_episodic_prompt()
     return f"""You are ResearchPal v2, a rigorous research assistant.
 
+
     You have two tools:
     1. search_corpus  — search the indexed documents (Washington Capitals, Ovechkin, etc.)
     2. search_web     — DuckDuckGo search for recent information not in the corpus
 
     Rules:
     - Base your answers ONLY on the retrieved context.
-    - Always cite your sources explicitly.
+    - Always cite your sources explicitly:
+      - For corpus results: mention the filename (e.g. "According to capitals_2025_info.pdf, ...")
+      - For web results: mention the title and URL (e.g. "According to NHL.com (https://...), ...")
     - Never invent information.
     - ALWAYS respond in the same language as the user's question.
-
     {episodic}"""
 
 
@@ -170,10 +172,7 @@ Question : {state['question']}
 Réponds UNIQUEMENT avec la question reformulée.""")])
 
     rewritten = response.content.strip()
-    # Garde-fou : forcer la sortie après MAX_RETRIES
-    grade = "relevant" if retry_count >= MAX_RETRIES else "not_relevant"
-
-    return {**state, "rewritten_question": rewritten, "retry_count": retry_count, "grade": grade}
+    return {**state, "rewritten_question": rewritten, "retry_count": retry_count, "grade": "not_relevant"}
 
 
 # 
@@ -229,10 +228,12 @@ def decide_after_tools(state: AgentState) -> Literal["retrieve", "generate"]:
     return "retrieve"
 
 
-def decide_after_grading(state: AgentState) -> Literal["generate", "rewrite_query"]:
-    """Pertinent ou max retries atteint → generate. Sinon → reformuler."""
-    if state.get("grade") == "relevant" or state.get("retry_count", 0) >= MAX_RETRIES:
+def decide_after_grading(state: AgentState) -> Literal["generate", "rewrite_query", "execute_tools"]:
+    """Pertinent → generate. Max retries atteint → web search. Sinon → reformuler."""
+    if state.get("grade") == "relevant":
         return "generate"
+    if state.get("retry_count", 0) >= MAX_RETRIES:
+        return "execute_tools"  # fallback vers search_web
     return "rewrite_query"
 
 
@@ -264,7 +265,7 @@ def build_graph(use_checkpointer: bool = True):
     builder.add_conditional_edges(
         "grade_documents",
         decide_after_grading,
-        {"generate": "generate", "rewrite_query": "rewrite_query"},
+        {"generate": "generate", "rewrite_query": "rewrite_query", "execute_tools": "execute_tools"},
     )
     builder.add_edge("rewrite_query", "retrieve")  # cycle correctif
     builder.add_edge("generate", END)

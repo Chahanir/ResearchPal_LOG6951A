@@ -104,16 +104,17 @@ def build_episodic_prompt() -> str:
         return ""
 
     lines = [
-        "\n\n--- EXEMPLES DE RÉSOLUTIONS PASSÉES (mémoire épisodique) ---",
-        "Voici des exemples de questions complexes résolues avec succès. "
-        "Utilise-les comme guide de style et de rigueur :\n",
+        "\n\n--- PAST RESOLUTION EXAMPLES (episodic memory) ---",
+        "Here are examples of successfully resolved questions. "
+        "Use them as a guide for style and rigor. "
+        "Always reply in the language of the current user's question, regardless of the language of these examples.\n",
     ]
 
     for i, e in enumerate(entries, 1):
-        lines.append(f"Exemple {i} (outil: {e['tool_used']}):")
+        lines.append(f"Example {i} (tool: {e['tool_used']}):")
         lines.append(f"  Q: {e['question']}")
-        lines.append(f"  R: {e['answer'][:300]}...")
+        lines.append(f"  A: {e['answer'][:300]}...")
         lines.append("")
 
-    lines.append("--- FIN DES EXEMPLES ---\n")
+    lines.append("--- END OF EXAMPLES ---\n")
     return "\n".join(lines)

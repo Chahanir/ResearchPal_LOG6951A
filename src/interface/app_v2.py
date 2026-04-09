@@ -131,7 +131,7 @@ if prompt := st.chat_input("Posez votre question..."):
 
     # Exécuter le graphe agentique
     with st.chat_message("assistant"):
-        with st.spinner("🔍 Recherche et raisonnement en cours..."):
+        with st.spinner("Thinking..."):
             start = time.perf_counter()
             from src.agent.graph import run_agent
             result = run_agent(

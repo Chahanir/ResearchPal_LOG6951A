@@ -1,9 +1,16 @@
 [
   {
-    "question": "how many goes does ovechkin have",
-    "answer": "D'après les informations disponibles dans le corpus local, nous pouvons déduire que :\n\n* Alexander Ovechkin a marqué 600 buts en carrière (soit 600 goals).\n* Il a réalisé 500 passes de but (soit 500 assists).\n\nIl est donc difficile de donner un nombre précis pour les \"goes\" (je suppose que vous voulez dire les buts ou les points) d'Ovechkin, car il y a deux types de statistiques différentes. Cependant, on peut dire qu'il a marqué 600 buts et réalisé 500 passes de but en carrière.\n\nSource : corpus local (Alexander_Ovechkin).",
+    "question": "how many goals does ovechkin have",
+    "answer": "According to Passage 3 (source: Alexander_Ovechkin), Alexander Ovechkin has scored a league high of 437 goals in the 2010s and 200 in the 2020s. However, it's also mentioned that he tied Wayne Gretzky for the all-time goals record by scoring his 893rd and 894th goals.\n\nTo answer your question directly: According to Passage 3 (source: Alexander_Ovechkin), Alexander Ovechkin has at least 893 goals.",
     "tool_used": "corpus",
     "quality_score": 0.9,
-    "timestamp": "2026-04-09T17:13:56"
+    "timestamp": "2026-04-09T19:06:08"
+  },
+  {
+    "question": "Quels sont les jeunes joueurs chez les capitals",
+    "answer": "D'après le corpus local, je n'ai trouvé aucune information spécifique sur les jeunes joueurs des Capitals. Cependant, je peux vous dire que l'équipe a une équipe de développement qui comprend des jeunes joueurs tels que:\n\n* Carter Carbery (en) \n* Connor McMichael\n* Beck Miesse\n\nCes informations sont mentionnées dans le document \"capitals_2025_info.pdf\", qui est accessible dans le corpus local.\n\nSi vous souhaitez en savoir plus sur ces joueurs ou d'autres jeunes joueurs des Capitals, je peux vous suggérer de consulter les archives de la franchise ou les sites web officiels des Capitals.",
+    "tool_used": "corpus",
+    "quality_score": 0.9,
+    "timestamp": "2026-04-09T19:11:06"
   }
 ]
