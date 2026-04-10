@@ -1,14 +1,15 @@
-# ResearchPal v1 — Pipeline RAG de base
+# ResearchPal v2 — Pipeline RAG Agentique
 
-**LOG6951A — Travail pratique 1 — Hiver 2026**  
+**LOG6951A — Travail pratique 2 — Hiver 2026**  
 Taha-Chahine HAMITOUCHE — 2118576  
+Félix DOWL - 
 Chargé de cours : Simon Barrette
 
 ---
 
 ## Description
 
-ResearchPal est un assistant de recherche personnel basé sur une architecture RAG (Retrieval-Augmented Generation). Il permet d'ingérer des documents (PDF, Markdown, pages web) et d'y poser des questions en langage naturel. Le système récupère les passages pertinents et génère des réponses citant explicitement leurs sources.
+ResearchPal v2 est une extension agentique du TP1. Le pipeline RAG linéaire est transformé en une **state machine LangGraph** capable de détecter et corriger ses propres erreurs de retrieval (Corrective RAG). L'agent choisit dynamiquement entre deux outils (`search_corpus` et `search_web`), dispose d'une mémoire à deux niveaux (court terme SQLite + long terme épisodique), et est instrumenté avec Arize Phoenix pour l'observabilité.
 
 ---
 
@@ -22,6 +23,10 @@ ResearchPal est un assistant de recherche personnel basé sur une architecture R
 # Installer Ollama (macOS / Linux)
 curl -fsSL https://ollama.com/install.sh | sh
 
+# Windows — via winget (Windows 11)
+winget install Ollama.Ollama
+# ou télécharger le .exe directement sur https://ollama.com/download
+
 # Télécharger le modèle llama3.2
 ollama pull llama3.2
 ```
@@ -33,8 +38,8 @@ ollama pull llama3.2
 ### 1. Cloner / extraire le projet
 
 ```bash
-unzip LOG6951A_TP1_HAMITOUCHE.zip
-cd LOG6951A_TP1_HAMITOUCHE
+unzip ResearchPal_LOG6951A.zip
+cd ResearchPal_LOG6951A.zip
 ```
 
 ### 2. Créer et activer un environnement virtuel
@@ -64,28 +69,42 @@ pip install -r requirements.txt
 ├── README.md
 ├── requirements.txt
 ├── data/
-│   └── sample_docs/           # Corpus de test (PDF + Markdown)
+│   └── sample_docs/                    # Corpus de test
 │       ├── capitals_2025_info.pdf
 │       └── WASHINGTON_CAPITALS_DATASET.md
+├── memory/                             # Persistance mémoire (gitignored)
+│   ├── checkpoints.sqlite              # Mémoire court terme (LangGraph)
+│   └── episodic_memory.json            # Mémoire long terme (Option B)
+├── eval/                               # Résultats d'évaluation
+│   ├── ragas_results.json
+│   └── llm_judge_results.json
+├── traces/                             # Captures Phoenix
+├── src/
+│   ├── config.py                       # Paramètres globaux
+│   ├── llm_factory.py                  # Instanciation LLM et embeddings
+│   ├── agent/
+│   │   ├── graph.py                    # Graphe LangGraph (T1)
+│   │   ├── state.py                    # AgentState TypedDict (T1)
+│   │   ├── tools.py                    # Outils @tool : search_corpus, search_web (T2)
+│   │   └── memory.py                   # Checkpointer SQLite + mémoire épisodique (T3)
+│   ├── ingestion/
+│   │   ├── loader.py                   # Chargement PDF / Markdown / URL
+│   │   └── indexer.py                  # Embeddings et indexation ChromaDB
+│   ├── retrieval/
+│   │   └── strategies.py              # Stratégies cosinus et MMR
+│   ├── observability/
+│   │   └── tracing.py                  # Arize Phoenix + décorateur @instrument_node (T4)
+│   ├── evaluation/
+│   │   ├── dataset.py                  # Dataset 15 paires (T5)
+│   │   ├── ragas_eval.py               # Évaluation faithfulness + answer_relevancy (T5)
+│   │   └── llm_judge.py                # LLM-as-judge : citation_quality (T5)
+│   └── interface/
+│       └── app_v2.py                   # Interface Streamlit TP2
 ├── scripts/
-│   ├── ingest.py               # Script d'ingestion du corpus initial
-│   ├── test_retrieval.py       # Tests T2 — comparaison cosinus vs MMR
-│   ├── test_rag.py             # Tests T3 — pipeline RAG end-to-end
-│   └── test_optimization.py    # Tests T4 — comparaison avant/après multi-query
-└── src/
-    ├── config.py               # Paramètres globaux (LLM, embeddings, chunking)
-    ├── llm_factory.py          # Instanciation du LLM et des embeddings
-    ├── ingestion/
-    │   ├── loader.py           # Chargement PDF / Markdown / URL + segmentation
-    │   └── indexer.py          # Génération d'embeddings et indexation ChromaDB
-    ├── retrieval/
-    │   └── strategies.py       # Stratégies cosinus et MMR
-    ├── query_optimization/
-    │   └── optimizer.py        # Multi-query retrieval + RRF
-    ├── generation/
-    │   └── rag_pipeline.py     # Pipeline RAG complet avec historique
-    └── interface/
-        └── app.py              # Interface Streamlit (T5)
+│   ├── ingest.py                       # Ingestion du corpus initial
+│   ├── run_eval.py                     # Évaluation complète (RAGAS + LLM-judge)
+│   ├── demo_tool_selection.py          # Démonstration sélection dynamique d'outils
+│   └── test_corrections.py             # Tests du cycle correctif
 ```
 
 ---
@@ -94,13 +113,11 @@ pip install -r requirements.txt
 
 ### Étape 1 — Ingérer le corpus initial
 
-Ce script charge les trois sources du corpus (PDF, Markdown, Wikipedia via URL) et les indexe dans ChromaDB.
-
 ```bash
 python scripts/ingest.py
 ```
 
-Pour repartir d'une base vide (utile lors des tests) :
+Pour repartir d'une base vide :
 
 ```bash
 python scripts/ingest.py --reset
@@ -109,39 +126,47 @@ python scripts/ingest.py --reset
 ### Étape 2 — Lancer l'interface conversationnelle
 
 ```bash
-streamlit run src/interface/app.py
+streamlit run src/interface/app_v2.py
 ```
 
-L'interface s'ouvre automatiquement dans le navigateur à l'adresse `http://localhost:8501`.
+L'interface s'ouvre à `http://localhost:8501`.
+
+### Étape 3 — Démarrer Phoenix (observabilité)
+
+Une fois l'interface ouverte, cliquer sur **"🚀 Démarrer Phoenix"** dans la sidebar. Phoenix démarre localement et est accessible à `http://localhost:6006`. Aucun compte cloud requis.
 
 ---
 
 ## Utilisation de l'interface
 
-- **Zone de chat** (gauche) : posez vos questions en langage naturel. Chaque réponse affiche un expander *📎 Sources utilisées*.
-- **Sidebar** (droite) :
-  - Uploader un fichier PDF ou Markdown pour l'indexer
+- **Zone de chat** : posez vos questions. L'agent affiche l'outil utilisé, le nombre de retries, le grade et la latence pour chaque réponse.
+- **Sidebar** :
+  - Démarrer Phoenix pour l'observabilité
+  - Uploader un PDF ou Markdown pour l'indexer à la volée
   - Ajouter une page web par URL
-  - Changer la stratégie de retrieval (`cosine` ou `mmr`)
-  - Activer/désactiver le **Multi-Query** (T4)
-  - Effacer la conversation
+  - Voir les exemples mémorisés (mémoire épisodique long terme)
+  - Créer une nouvelle session (nouveau thread_id)
 
 ---
 
-## Scripts de test
-
-Ces scripts reproduisent les évaluations documentées dans le rapport (sections T2, T3, T4). Ils nécessitent que le corpus ait été ingéré au préalable.
+## Évaluation qualité (T5)
 
 ```bash
-# T2 — Comparaison cosinus vs MMR sur 5 requêtes
-python scripts/test_retrieval.py
-
-# T3 — Pipeline RAG end-to-end (3 tours de dialogue)
-python scripts/test_rag.py
-
-# T4 — Impact du multi-query (avant/après sur 3 requêtes)
-python scripts/test_optimization.py
+# Lancer l'évaluation complète (RAGAS + LLM-as-judge) sur 15 paires
+python scripts/run_eval.py
 ```
+
+Les résultats sont sauvegardés dans `eval/ragas_results.json` et `eval/llm_judge_results.json`.
+
+---
+
+## Démonstration sélection d'outils (T2)
+
+```bash
+python scripts/demo_tool_selection.py
+```
+
+Démontre sur 3 requêtes contrastées (corpus / hors-corpus / mixte) que l'agent sélectionne dynamiquement le bon outil.
 
 ---
 
@@ -157,29 +182,45 @@ Les principaux paramètres sont centralisés dans `src/config.py` :
 | `CHUNK_SIZE` | `500` | Taille des chunks (caractères) |
 | `CHUNK_OVERLAP` | `50` | Chevauchement entre chunks |
 | `RETRIEVAL_K` | `4` | Nombre de chunks récupérés |
-| `MMR_LAMBDA` | `0.5` | Compromis pertinence/diversité MMR |
-| `MULTI_QUERY_N` | `3` | Nombre de variantes générées (T4) |
+
+---
+
+## Architecture agentique (T1)
+
+Le graphe LangGraph implémente le pattern **Corrective RAG** avec les nœuds suivants :
+
+| Nœud | Rôle |
+|---|---|
+| `route_question` | LLM avec bind_tools — décide quel outil invoquer |
+| `execute_tools` | Exécute search_corpus ou search_web via ToolNode |
+| `retrieve` | Récupération ChromaDB (fallback si pas de résultat web) |
+| `grade_documents` | Évalue la pertinence des documents (LLM) |
+| `rewrite_query` | Reformule la question si grade = not_relevant (max 3 retries) |
+| `generate` | Génère la réponse finale avec le contexte disponible |
 
 ---
 
 ## Corpus de test
 
-Le corpus initial porte sur l'équipe de hockey des Washington Capitals :
-
 | Source | Format | Description |
 |---|---|---|
-| `capitals_2025_info.pdf` | PDF | Guide du camp de développement 2025 (16 pages) |
+| `capitals_2025_info.pdf` | PDF | Guide du camp de développement 2025 |
 | `WASHINGTON_CAPITALS_DATASET.md` | Markdown | Statistiques joueurs 2024-25 et 2025-26 |
-| Wikipedia — Alexander Ovechkin | URL | Page Wikipedia récupérée au moment de l'ingestion |
+| Wikipedia — Alexander Ovechkin | URL | Page Wikipedia indexée au moment de l'ingestion |
 
 ---
 
-## Dépendances principales
+## Stack technologique
 
 | Composante | Technologie |
 |---|---|
-| Orchestration RAG | LangChain 0.3+ |
+| Orchestration agentique | LangGraph |
+| Framework RAG | LangChain |
 | Base vectorielle | ChromaDB (local) |
 | LLM | llama3.2 via Ollama |
 | Embeddings | all-MiniLM-L6-v2 (Sentence Transformers) |
+| Observabilité | Arize Phoenix (local, sans compte cloud) |
+| Recherche web | DuckDuckGo (sans clé API) |
 | Interface | Streamlit |
+| Mémoire court terme | LangGraph SqliteSaver |
+| Mémoire long terme | JSON épisodique (Option B) |
