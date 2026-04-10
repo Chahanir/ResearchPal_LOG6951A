@@ -1,8 +1,8 @@
 {
   "scores": {
-    "faithfulness": 0.133,
-    "answer_relevancy": 0.133,
-    "evaluation_time_s": 366.42,
+    "faithfulness": 0.267,
+    "answer_relevancy": 0.267,
+    "evaluation_time_s": 341.57,
     "n_pairs": 15
   },
   "per_question": [
@@ -10,9 +10,9 @@
       "id": "Q1",
       "question": "Combien de buts Alexander Ovechkin a-t-il marqués lors de la saison 2024-25 ?",
       "faithfulness": 0,
-      "faith_reason": "La réponse contient des affirmations non présentes dans le contexte, notamment le nombre de buts marqués par Ovechkin lors de la saison 2024-25.",
+      "faith_reason": "La réponse contient des affirmations non présentes dans le contexte, notamment la mention de la saison 2024-25 et les buts marqués par Ovechkin.",
       "answer_relevancy": 0,
-      "relevancy_reason": "La réponse ne répond pas à la question posée car elle n'a trouvé aucune information spécifique sur les performances de la saison 2024-25 d'Alexander Ovechkin et se concentre sur des informations non pertinentes."
+      "relevancy_reason": "La réponse ne répond pas à la question posée car elle n'apporte aucune information spécifique sur les performances de Alexander Ovechkin lors de la saison 2024-25."
     },
     {
       "id": "Q2",
@@ -20,7 +20,7 @@
       "faithfulness": 0,
       "faith_reason": "Manque d'information spécifique sur l'entraîneur-chef des Washington Capitals en 2025",
       "answer_relevancy": 0,
-      "relevancy_reason": "La réponse ne répond pas directement à la question posée car elle fournit des informations sur les deux premiers choix de draft de l'année 2025 et non sur l'entraîneur-chef des Washington Capitals en 2025."
+      "relevancy_reason": "La réponse ne répond pas à la question car elle n'apporte aucune information spécifique sur l'entraîneur-chef des Washington Capitals en 2025."
     },
     {
       "id": "Q3",
@@ -28,29 +28,29 @@
       "faithfulness": 1,
       "faith_reason": "Toutes les affirmations de la réponse sont supportées par le contexte",
       "answer_relevancy": 1,
-      "relevancy_reason": "La réponse répond directement et complètement au nom de l'aréna où jouent les Washington Capitals"
+      "relevancy_reason": "La réponse répond directement et complètement à la question sur le nom de l'aréna des Washington Capitals"
     },
     {
       "id": "Q4",
       "question": "Quelle est la position d'Ovechkin sur la glace ?",
       "faithfulness": 0,
-      "faith_reason": "La réponse contient des affirmations non présentes dans le contexte (hallucination)",
+      "faith_reason": "La réponse contient des affirmations non présentes dans le contexte, notamment 'il est connu pour ses buts et ses passes décisives' qui n'est pas explicitement mentionné dans le passage 3 du corpus local.",
       "answer_relevancy": 0,
-      "relevancy_reason": "La réponse ne répond pas directement à la question posée sur la position d'Ovechkin sur la glace"
+      "relevancy_reason": "La réponse ne répond pas directement à la question posée, car elle aborde les informations générales sur Ovechkin sans fournir une réponse précise à la question spécifique sur sa position sur la glace."
     },
     {
       "id": "Q5",
       "question": "En quelle année les Capitals ont-ils remporté la Coupe Stanley ?",
       "faithfulness": 1,
       "faith_reason": "Toutes les affirmations de la réponse sont supportées par le contexte",
-      "answer_relevancy": 0,
-      "relevancy_reason": "La réponse ne répond pas directement à la question posée, car elle n'indique pas l'année précise dans laquelle les Capitals ont remporté la Coupe Stanley."
+      "answer_relevancy": 1,
+      "relevancy_reason": "La réponse répond directement à la question posée en mentionnant l'année 2018 comme année de remport du titre."
     },
     {
       "id": "Q6",
       "question": "Quel record d'Ovechkin a-t-il brisé concernant les buts en carrière en NHL ?",
       "faithfulness": 0,
-      "faith_reason": "La réponse contient des affirmations non présentes dans le contexte, notamment la mention de un total de 900 buts et d'une source 'Alexander_Ovechkin' qui n'est pas mentionnée dans le corpus local.",
+      "faith_reason": "La réponse contient des affirmations non présentes dans le contexte, notamment le record de buts en carrière NHL avec un total de 900 buts et la source 'Alexander_Ovechkin' qui n'est pas mentionnée dans les passages 1, 2 ou 3.",
       "answer_relevancy": 0,
       "relevancy_reason": "La réponse ne répond pas directement à la question posée, car elle mentionne un 'corpus local' et une source spécifique qui n'est pas nécessairement pertinente pour répondre à la question."
     },
@@ -58,49 +58,49 @@
       "id": "Q7",
       "question": "Quel gardien de but évolue pour les Capitals lors de la saison 2025-26 ?",
       "faithfulness": 0,
-      "faith_reason": "La réponse contient des affirmations non présentes dans le contexte, notamment les noms de gardiens de but et d'équipe de développement sans précision.",
+      "faith_reason": "aucune information spécifique sur les gardiens de but des Capitals lors de la saison 2025-26",
       "answer_relevancy": 0,
-      "relevancy_reason": "La réponse ne répond pas à la question car elle ne mentionne pas le gardien de but spécifique évoluant pour les Capitals lors de la saison 2025-26."
+      "relevancy_reason": "La réponse ne répond pas à la question car elle n'a trouvé aucune information spécifique sur les gardiens de but des Capitals lors de la saison 2025-26."
     },
     {
       "id": "Q8",
       "question": "Quel est le numéro de chandail d'Alexander Ovechkin ?",
       "faithfulness": 0,
-      "faith_reason": "La réponse contient des affirmations non présentes dans le contexte (hallucination)",
+      "faith_reason": "aucune information sur le numéro de chandail",
       "answer_relevancy": 0,
-      "relevancy_reason": "La réponse ne répond pas directement et complètement à la question sur le numéro de chandail d'Alexander Ovechkin"
+      "relevancy_reason": "La réponse ne répond pas directement à la question et contient des informations non pertinentes"
     },
     {
       "id": "Q9",
       "question": "Quelle est la nationalité d'Alexander Ovechkin ?",
-      "faithfulness": 0,
-      "faith_reason": "La réponse contient une affirmation non présente dans le contexte, à savoir la mention de 'passages 3 et 4' qui n'existe pas dans le corpus local.",
+      "faithfulness": 1,
+      "faith_reason": "La réponse est fondée sur le contexte fourni, car les passages 2 et 3 mentionnent explicitement la participation d'Ovechkin à la Russie aux Jeux de l'Hiver en 2006, 2010 et 2014.",
       "answer_relevancy": 1,
       "relevancy_reason": "La réponse répond directement à la question sur la nationalité d'Alexander Ovechkin"
     },
     {
       "id": "Q10",
       "question": "Combien d'assistances Dylan Strome a-t-il réalisées lors de la saison 2024-25 ?",
-      "faithfulness": 0,
-      "faith_reason": "La réponse contient des affirmations non présentes dans le contexte, notamment la mention de sources externes et de passages non identifiés.",
-      "answer_relevancy": 0,
-      "relevancy_reason": "La réponse ne répond pas directement à la question car elle fournit des informations sur plusieurs sources et passages du corpus local plutôt que le nombre précis d'assistances réalisées par Dylan Strome lors de la saison 2024-25."
+      "faithfulness": 1,
+      "faith_reason": "La réponse est entièrement basée sur le contexte fourni et ne contient aucune information non présente dans les passages.",
+      "answer_relevancy": 1,
+      "relevancy_reason": "La réponse fournit une quantité spécifique et précise d'assistances réalisées par Dylan Strome lors de la saison 2024-25, en citant des sources pour étayer cette information."
     },
     {
       "id": "Q11",
       "question": "Quel est le score du match des Capitals d'hier soir ?",
       "faithfulness": 0,
-      "faith_reason": "La réponse contient une référence à ESPN et à un lien vers une page de scores en temps réel, ce qui n'est pas pertinent pour la question posée.",
+      "faith_reason": "La réponse contient des affirmations non présentes dans le contexte (hallucination), telles que 'Selon 777score.com' et 'Livescore', qui sont des ressources externes et ne sont pas directement liées au contexte du passage.",
       "answer_relevancy": 0,
-      "relevancy_reason": "La réponse ne fournit pas d'information spécifique sur le score du match des Capitals d'hier soir."
+      "relevancy_reason": "La réponse ne répond pas directement à la question car elle ne fournit aucune information spécifique sur le score du match des Capitals d'hier soir."
     },
     {
       "id": "Q12",
       "question": "Combien de buts Ovechkin a-t-il marqués lors de la finale de la Coupe du Monde 2",
       "faithfulness": 0,
-      "faith_reason": "La réponse contient des affirmations non présentes dans le contexte, notamment la mention d'un article spécifique (Le grand Ovechkin) et de l'article Prediction Coupe Du Monde 2026 qui n'est pas lié à la finale de la Coupe du Monde 2026.",
+      "faith_reason": "La réponse contient des affirmations non présentes dans le contexte (hallucination), notamment les informations sur la finale de la Coupe du Monde 2026 et le classement de Ovechkin en histoire de la LNH.",
       "answer_relevancy": 0,
-      "relevancy_reason": "La réponse ne répond pas à la question posée car elle n'a trouvé aucune information spécifique sur les performances d'Ovechkin lors de la finale de la Coupe du Monde 2026."
+      "relevancy_reason": "La réponse ne répond pas directement à la question posée car elle fournit des informations sur le nombre total de buts marqués par Ovechkin en carrière NHL, mais pas spécifiquement pour la finale de la Coupe du Monde 2026."
     },
     {
       "id": "Q13",
@@ -108,23 +108,23 @@
       "faithfulness": 0,
       "faith_reason": "l'information sur qui a remplacé Ovechkin comme meilleur buteur de la NHL après sa retraite n'est pas supportée par le contexte",
       "answer_relevancy": 0,
-      "relevancy_reason": "La réponse ne répond pas à la question posée car elle n'identifie pas clairement qui a remplacé Ovechkin comme meilleur buteur de la NHL après sa retraite."
+      "relevancy_reason": "La réponse ne répond pas directement à la question posée, car elle ne mentionne pas qui a remplacé Ovechkin comme meilleur buteur de la NHL après sa retraite."
     },
     {
       "id": "Q14",
       "question": "Combien de saisons Ovechkin a-t-il joué avec les Capitals depuis son record de b",
       "faithfulness": 0,
-      "faith_reason": "La réponse contient des affirmations non présentes dans le contexte, notamment 'D'après le corpus local, je n'ai trouvé aucune information spécifique sur la saison d'Ovechkin avec les Capitals depuis son record de buts.'",
+      "faith_reason": "Invalid \\escape: line 1 column 113 (char 112)",
       "answer_relevancy": 0,
-      "relevancy_reason": "La réponse ne répond pas directement à la question posée car elle manque d'informations sur le nombre de saisons jouées par Ovechkin avec les Capitals depuis son record de buts."
+      "relevancy_reason": "La réponse ne répond pas directement à la question posée, car elle manque les informations sur le nombre de saisons jouées avec les Capitals."
     },
     {
       "id": "Q15",
       "question": "Quel est le total de points (buts + assistances) du meilleur buteur des Capitals",
       "faithfulness": 0,
-      "faith_reason": "Laffirmation sur le total de points du meilleur buteur des Capitals est une hallucination car elle n'est pas supportée par le contexte.",
+      "faith_reason": "La réponse contient des affirmations non présentes dans le contexte, notamment le nom du meilleur buteur et le nombre de matchs joués.",
       "answer_relevancy": 0,
-      "relevancy_reason": "La réponse ne répond pas directement à la question posée et est vague sur les informations fournies."
+      "relevancy_reason": "La réponse ne répond pas directement à la question posée car elle fournit des informations générales et non spécifiques sur le meilleur buteur des Capitals en 2024-25."
     }
   ]
 }

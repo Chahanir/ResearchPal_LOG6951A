@@ -9,6 +9,7 @@
 - **Arena:** Capital One Arena
 - **Stanley Cups:** 1
 - **Last Stanley Cup:** 2018
+- **Head Coach:** Spencer Carbery (since 2023)
 
 ---
 
@@ -80,7 +81,7 @@
 - **Age:** 40
 
 ### Career Stats (NHL Totals)
-- **Career Goals:** 923 (NHL all-time leader)
+- **Career Goals:** 923 (NHL all-time leader. Record previously held by Wayne Gretzky with 894 goals)
 - **Career Assists:** 753
 - **Career Points:** 1,676
 - **Career GP:** 1,563

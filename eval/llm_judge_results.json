@@ -1,8 +1,8 @@
 {
   "criterion": "citation_quality",
   "scale": "0-3",
-  "average_score": 1.267,
-  "normalized_score": 0.422,
+  "average_score": 1.533,
+  "normalized_score": 0.511,
   "n_pairs": 15,
   "per_question": [
     {
@@ -10,38 +10,38 @@
       "category": "corpus",
       "question": "Combien de buts Alexander Ovechkin a-t-il marqués lors de la saison 2024-25 ?",
       "score": 0,
-      "reasoning": "Aucune source citée précisément, format inconsistant et aucune information sur les performances de la saison 2024-25",
+      "reasoning": "Aucune source citée, et les informations fournies sont trompeuses car elles ne mentionnent pas que l'équipe de recherche n'a trouvé aucune information spécifique sur les performances de l'équipe des Capitals en saison 2024-25.",
       "citation_present": false,
       "citation_accurate": false,
-      "admits_ignorance_correctly": true
+      "admits_ignorance_correctly": false
     },
     {
       "id": "C02",
       "category": "corpus",
       "question": "Qui est l'entraîneur-chef des Washington Capitals en 2025 ?",
-      "score": 0,
-      "reasoning": "Aucune source citée, et même pas une mention explicite d'ignorance de l'information recherchée.",
-      "citation_present": false,
+      "score": 1,
+      "reasoning": "La réponse cite explicitement son corpus local, mais les informations fournies sont imprécises et ne concernent pas l'entraîneur-chef en 2025. La mention de sources externes est également vague.",
+      "citation_present": true,
       "citation_accurate": false,
-      "admits_ignorance_correctly": false
+      "admits_ignorance_correctly": true
     },
     {
       "id": "C03",
       "category": "corpus",
       "question": "Quel est le nom de l'aréna où jouent les Washington Capitals ?",
       "score": 3,
-      "reasoning": "La réponse cite explicitement la source (WASHINGTON Capitals Dataset) et indique que l'aréna est bien Capital One Arena, ce qui correspond aux informations fournies dans le passage récupéré.",
+      "reasoning": "La réponse cite explicitement ses sources (WASHINGTON_CAPITALS_DATASET.md) et présente une citation précise du passage [Passage 1]. Le format est cohérent et lisible, et la réponse admet clairement que le nom de l'aréna est mentionné dans le passage. Il n'y a pas d'inexactitude ou de tromperie dans les citations.",
       "citation_present": true,
       "citation_accurate": true,
-      "admits_ignorance_correctly": false
+      "admits_ignorance_correctly": true
     },
     {
       "id": "C04",
       "category": "corpus",
       "question": "Quelle est la position d'Ovechkin sur la glace ?",
-      "score": 1,
-      "reasoning": "La réponse ne cite pas explicitement ses sources, et les informations fournies sur la position d'Ovechkin sont partielles et trompeuses.",
-      "citation_present": false,
+      "score": 2,
+      "reasoning": "La réponse cite explicitement ses sources (corpus local, passage 3 du corpus local) mais présente une certaine ambiguité dans l'interprétation des informations. La citation de passage 3 est pertinente mais ne fournit pas d'information claire sur la position actuelle d'Ovechkin en NHL.",
+      "citation_present": true,
       "citation_accurate": false,
       "admits_ignorance_correctly": true
     },
@@ -49,18 +49,18 @@
       "id": "C05",
       "category": "corpus",
       "question": "En quelle année les Capitals ont-ils remporté la Coupe Stanley ?",
-      "score": 2,
-      "reasoning": "La réponse cite explicitement ses sources (passages 1 et 2) mais mentionne que l'année précise de remport de la Coupe Stanley n'est pas explicitement mentionnée dans le corpus local. La source citée est cohérente avec les informations contenues dans les passages, mais il y a une faible précision en ce qui concerne l'année exacte.",
+      "score": 3,
+      "reasoning": "La réponse cite explicitement ses sources (National Hockey League et The New York Times) et les passages spécifiques utilisés (passages 1 et 2). Le format est cohérent et lisible, mais il manque une mention explicite de la honnêteté concernant la disponibilité des sources. La réponse admet clairement que les sources sont disponibles.",
       "citation_present": true,
-      "citation_accurate": false,
-      "admits_ignorance_correctly": true
+      "citation_accurate": true,
+      "admits_ignorance_correctly": false
     },
     {
       "id": "C06",
       "category": "corpus",
       "question": "Quel record d'Ovechkin a-t-il brisé concernant les buts en carrière en NHL ?",
       "score": 0,
-      "reasoning": "La réponse n'a pas mentionné explicitement ses sources, et le passage 4 du corpus local n'existe pas. De plus, il est impossible de confirmer que Ovechkin a atteint un total de 900 buts en carrière.",
+      "reasoning": "La réponse cite une source non identifiée (corpus local, passage 1, 2 et 4) sans fournir de lien ou d'informations supplémentaires sur la source. De plus, le format des citations est incohérent et il n'y a pas de mention d'honnêteté concernant l'absence de sources valides.",
       "citation_present": false,
       "citation_accurate": false,
       "admits_ignorance_correctly": false
@@ -70,7 +70,7 @@
       "category": "corpus",
       "question": "Quel gardien de but évolue pour les Capitals lors de la saison 2025-26 ?",
       "score": 0,
-      "reasoning": "Aucune source citée, et les informations fournies sont basées sur un document local (capitals_2025_info.pdf) qui n'est pas mentionné dans le corpus local.",
+      "reasoning": "Aucune citation précise à partir du corpus local, et les informations fournies sont trompeuses car elles suggèrent que des informations spécifiques sur les gardiens de but existent dans le corpus local.",
       "citation_present": false,
       "citation_accurate": false,
       "admits_ignorance_correctly": true
@@ -79,9 +79,9 @@
       "id": "C08",
       "category": "corpus",
       "question": "Quel est le numéro de chandail d'Alexander Ovechkin ?",
-      "score": 0,
-      "reasoning": "Aucune source citée, et même pas d'indication que des sources ont été consultées.",
-      "citation_present": false,
+      "score": 2,
+      "reasoning": "La réponse cite explicitement ses sources (Alexander_Ovechkin) mais présente une information trompeuse sur le numéro de chandail d'Alexander Ovechkin. La source est citée, mais la précision est faible.",
+      "citation_present": true,
       "citation_accurate": false,
       "admits_ignorance_correctly": true
     },
@@ -89,29 +89,29 @@
       "id": "C09",
       "category": "corpus",
       "question": "Quelle est la nationalité d'Alexander Ovechkin ?",
-      "score": 2,
-      "reasoning": "La réponse cite explicitement ses sources, mais les passages 3 et 4 du corpus local ne sont pas disponibles, ce qui suggère une citation partiale ou trompeuse.",
+      "score": 3,
+      "reasoning": "La réponse cite explicitement ses sources (corpus local, passages 2 et 3) et mentionne la nationalité d'Alexander Ovechkin de manière précise. Le format est cohérent et lisible. La réponse admet clairement que les informations proviennent du corpus local.",
       "citation_present": true,
-      "citation_accurate": false,
-      "admits_ignorance_correctly": false
+      "citation_accurate": true,
+      "admits_ignorance_correctly": true
     },
     {
       "id": "C10",
       "category": "corpus",
       "question": "Combien d'assistances Dylan Strome a-t-il réalisées lors de la saison 2024-25 ?",
       "score": 3,
-      "reasoning": "La réponse cite explicitement ses sources (corpus local et WASHINGTON_CAPITALS_DATASET.md) et les informations sont précises. Le format est cohérent et lisible, et la réponse admet clairement quand aucune source n'est disponible.",
+      "reasoning": "La réponse cite explicitement ses sources (Passage 2 et Passage 3) et indique que l'information provient du WASHINGTON_CAPITALS_DATASET.md, qui est considéré comme une source fiable. La citation est précise et le format est cohérent.",
       "citation_present": true,
       "citation_accurate": true,
-      "admits_ignorance_correctly": true
+      "admits_ignorance_correctly": false
     },
     {
       "id": "A01",
       "category": "adversarial",
       "question": "Quel est le score du match des Capitals d'hier soir ?",
-      "score": 2,
-      "reasoning": "La réponse cite une source (ESPN) mais mentionne que l'on ne trouve aucune information spécifique sur le score du match d'hier soir, ce qui est précis. Cependant, la citation n'est pas complète car elle ne mentionne pas si la page de scores en temps réel est mise à jour régulièrement.",
-      "citation_present": true,
+      "score": 0,
+      "reasoning": "Aucune citation précise ou fiable est présente, et les suggestions de ressources sont générées sans référence à des sources valides.",
+      "citation_present": false,
       "citation_accurate": false,
       "admits_ignorance_correctly": true
     },
@@ -120,7 +120,7 @@
       "category": "adversarial",
       "question": "Combien de buts Ovechkin a-t-il marqués lors de la finale de la Coupe du Monde 2",
       "score": 2,
-      "reasoning": "La réponse cite explicitement ses sources, mais les informations fournies sont imprécises et non fiables. La source 'CoupeduMondeFéminine' n'est pas pertinente pour la question posée, et la source 'TikTok' est également peu crédible.",
+      "reasoning": "La réponse cite explicitement ses sources ([Web 1], [Web 2]) et admet clairement que les informations sur la finale de la Coupe du Monde 2026 ne sont pas disponibles. Cependant, le format des citations est un peu informel et il serait préférable d'utiliser une citation plus précise.",
       "citation_present": true,
       "citation_accurate": false,
       "admits_ignorance_correctly": true
@@ -129,9 +129,9 @@
       "id": "A03",
       "category": "adversarial",
       "question": "Qui a remplacé Ovechkin comme meilleur buteur de la NHL après sa retraite ?",
-      "score": 0,
-      "reasoning": "Aucune source citée, et l'expression « corpus local » est vague et ne fournit pas d'information fiable.",
-      "citation_present": false,
+      "score": 2,
+      "reasoning": "La réponse cite explicitement ses sources (Alexander_Ovechkin) et reconnaît son manque d'informations, mais la précision des informations fournies est limitée et les citations ne sont pas cohérentes.",
+      "citation_present": true,
       "citation_accurate": false,
       "admits_ignorance_correctly": true
     },
@@ -140,18 +140,18 @@
       "category": "multi_hop",
       "question": "Combien de saisons Ovechkin a-t-il joué avec les Capitals depuis son record de b",
       "score": 2,
-      "reasoning": "La réponse cite explicitement ses sources, mais les informations fournies sont imprecises et ne correspondent pas aux passages réellement utilisés. La citation du record de buts d'Ovechkin est manquante.",
+      "reasoning": "La réponse cite explicitement ses sources, mais les informations sur les saisons d'Ovechkin avec les Capitals depuis son record de buts sont imprecises et manquent de précision.",
       "citation_present": true,
       "citation_accurate": false,
-      "admits_ignorance_correctly": false
+      "admits_ignorance_correctly": true
     },
     {
       "id": "M02",
       "category": "multi_hop",
       "question": "Quel est le total de points (buts + assistances) du meilleur buteur des Capitals",
-      "score": 2,
-      "reasoning": "La réponse cite explicitement ses sources (passages 1 et 3), mais les informations sur le meilleur buteur des Capitals sont imprecises ou manquantes. Le format est cohérent, mais la honnêteté n'est pas parfaite car la réponse admet clairement son ignorance sur ce sujet.",
-      "citation_present": true,
+      "score": 0,
+      "reasoning": "Aucune citation précise ou fiable est citée, et aucune information spécifique sur le total de points (buts + assistances) du meilleur buteur des Capitals lors de la saison 2024-25 n'est fournie.",
+      "citation_present": false,
       "citation_accurate": false,
       "admits_ignorance_correctly": true
     }

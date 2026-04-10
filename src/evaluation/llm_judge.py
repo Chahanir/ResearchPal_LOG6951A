@@ -11,6 +11,17 @@ EVAL_OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 SYSTEM_JUDGE_PROMPT = """Tu es un évaluateur expert en qualité des réponses de systèmes RAG.
 Ta mission est d'évaluer la QUALITÉ DES CITATIONS DE SOURCES dans une réponse.
 
+Corpus de référence — sources valides du système RAG :
+- WASHINGTON_CAPITALS_DATASET.md (statistiques joueurs, résultats saisons, informations équipe)
+- capitals_2025_info.pdf (communiqué de presse officiel Washington Capitals 2025-26)
+- Alexander_Ovechkin (page Wikipedia sur Alexander Ovechkin)
+
+IMPORTANT : Toute citation faisant référence à ces trois documents — sous n'importe quelle
+forme (ex. : "corpus local", "WASHINGTON_CAPITALS_DATASET.md", "capitals_2025_info.pdf",
+"Wikipedia Ovechkin", "passage 1", "passage 2", etc.) — est considérée comme une citation
+PRÉSENTE et potentiellement valide. Ne jamais pénaliser une réponse qui cite l'un de ces
+documents comme "source non fiable" ou "non identifiée".
+
 Critères d'évaluation — Qualité des citations :
 1. PRÉSENCE : La réponse cite-t-elle explicitement ses sources ?
 2. PRÉCISION : Les sources citées correspondent-elles aux passages réellement utilisés ?

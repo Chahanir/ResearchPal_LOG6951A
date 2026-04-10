@@ -1,4 +1,3 @@
-
 EVAL_DATASET = [
 
     {
@@ -40,7 +39,7 @@ EVAL_DATASET = [
         "id": "C06",
         "category": "corpus",
         "question": "Quel record d'Ovechkin a-t-il brisé concernant les buts en carrière en NHL ?",
-        "reference": "Alexander Ovechkin a brisé le record de buts en carrière en NHL de Wayne Gretzky, qui était de 894 buts.",
+        "reference": "Alexander Ovechkin a brisé le record de buts en carrière en NHL de Wayne Gretzky lors de la saison 2024-25, en marquant 44 buts en 65 matchs. Il est désormais le meilleur buteur de l'histoire de la NHL avec 923 buts en carrière.",
         "context_hint": "Ovechkin record buts carrière Gretzky",
     },
     {
@@ -106,7 +105,7 @@ EVAL_DATASET = [
         "id": "M02",
         "category": "multi_hop",
         "question": "Quel est le total de points (buts + assistances) du meilleur buteur des Capitals lors de la saison 2024-25, et combien de matchs a-t-il joués ?",
-        "reference": "Pour calculer le total de points d'un joueur, il faut combiner ses buts et ses assistances pour la saison 2024-25 et vérifier le nombre de matchs disputés selon les statistiques disponibles dans le corpus.",
+        "reference": "Le meilleur buteur des Capitals lors de la saison 2024-25 était Alexander Ovechkin avec 44 buts. En combinant buts et assistances, c'est Dylan Strome qui mène avec 82 points (29 buts + 53 assistances) en 82 matchs. Ovechkin totalisait 73 points (44G + 29A) en 65 matchs.",
         "context_hint": "meilleur buteur Capitals points buts assistances matchs 2024-25",
     },
 ]
