@@ -11,8 +11,9 @@ from langgraph.graph import StateGraph, START, END
 from langgraph.prebuilt import ToolNode
 
 from src.agent.state import AgentState
-from src.agent.memory import build_episodic_prompt, get_checkpointer
-from src.agent.tools import TOOLS
+from src.agent.memory import build_episodic_prompt, get_checkpointer, add_episodic_entry
+from src.agent.tools import TOOLS, search_web
+from src.observability.tracing import instrument_node
 
 MAX_RETRIES = 3
 
@@ -60,6 +61,7 @@ def get_system_prompt() -> str:
 
 # Nœud 1 : LLM décide lui-même s'il émet un tool_call ou répond directement
 
+@instrument_node("route_question")
 def route_question_node(state: AgentState) -> AgentState:
     """
     Appelle le LLM lié aux outils (bind_tools).
@@ -81,15 +83,37 @@ def route_question_node(state: AgentState) -> AgentState:
 _tool_node = ToolNode(TOOLS)
 
 
+@instrument_node("execute_tools")
 def execute_tools_node(state: AgentState) -> AgentState:
     """
     Exécute les outils via ToolNode (pattern standard LangGraph).
-    Extrait les résultats pour les nœuds suivants du graphe.
-    """
-    result = _tool_node.invoke({"messages": state.get("messages", [])})
-    new_messages = result.get("messages", state.get("messages", []))
 
-    # Détecter le type de résultat (web JSON vs corpus texte)
+    Deux cas :
+    - Cas normal   : le LLM a émis un tool_call → ToolNode l'exécute.
+    - Cas fallback : arrivée depuis decide_after_grading après MAX_RETRIES,
+                     pas de tool_call en attente → on appelle search_web directement.
+    """
+    messages = state.get("messages", [])
+    last = messages[-1] if messages else None
+    has_tool_calls = isinstance(last, AIMessage) and getattr(last, "tool_calls", None)
+
+    # Cas fallback : pas de tool_call en attente
+    if not has_tool_calls:
+        question = state.get("rewritten_question") or state["question"]
+        web_content = search_web.invoke({"query": question})
+        web_results = None
+        if (
+            web_content
+            and not web_content.startswith("AUCUN")
+            and not web_content.startswith("ERREUR")
+        ):
+            web_results = web_content
+        return {**state, "web_results": web_results, "tool_used": "web"}
+
+    # Cas normal : tool_call émis par le LLM
+    result = _tool_node.invoke({"messages": messages})
+    new_messages = result.get("messages", messages)
+
     web_results = None
     tool_used = "corpus"
 
@@ -110,6 +134,7 @@ def execute_tools_node(state: AgentState) -> AgentState:
 
 
 # Nœud 2 : récupération depuis ChromaDB (si pas de résultat web pertinent)
+@instrument_node("retrieve")
 def retrieve_node(state: AgentState) -> AgentState:
     """Récupère les passages pertinents depuis ChromaDB."""
     from src.ingestion.indexer import get_vectorstore
@@ -126,6 +151,7 @@ def retrieve_node(state: AgentState) -> AgentState:
 
 
 # Nœud 3 : grading de la pertinence des documents
+@instrument_node("grade_documents")
 def grade_documents_node(state: AgentState) -> AgentState:
     """
     Évalue la pertinence des documents récupérés.
@@ -162,6 +188,7 @@ Réponds UNIQUEMENT : "relevant" ou "not_relevant".""")])
 
 
 # Nœud 4 : reformulation de la question après échec du grading
+@instrument_node("rewrite_query")
 def rewrite_query_node(state: AgentState) -> AgentState:
     """Reformule la question et incrémente retry_count (garde-fou MAX_RETRIES)."""
     retry_count = state.get("retry_count", 0) + 1
@@ -177,6 +204,7 @@ Réponds UNIQUEMENT avec la question reformulée.""")])
 
 # 
 # Nœud 5 : génération de la réponse finale avec le contexte (corpus ou web)
+@instrument_node("generate")
 def generate_node(state: AgentState) -> AgentState:
     """Génère la réponse finale avec le contexte (corpus ou web)."""
     llm = get_llm_plain()
@@ -299,11 +327,31 @@ def run_agent(question: str, thread_id: str = "default", graph=None) -> dict:
     final_state = graph.invoke(initial_state, config=config)
     elapsed = (time.perf_counter() - start) * 1000
 
+    generation = final_state.get("generation", "")
+    tool_used = final_state.get("tool_used", "corpus")
+    grade = final_state.get("grade", "")
+
+    # Mémoire long terme (Option B) : persister les résolutions réussies comme exemples few-shot.
+    # On sauvegarde uniquement si le grade est "relevant" et que la réponse semble valide
+    # (non vide, sans message d'erreur ou d'absence de source).
+    if (
+        generation
+        and grade == "relevant"
+        and "erreur" not in generation.lower()
+        and "aucune source" not in generation.lower()
+    ):
+        add_episodic_entry(
+            question=question,
+            answer=generation,
+            tool_used=tool_used or "corpus",
+            quality_score=1.0,
+        )
+
     return {
-        "generation": final_state.get("generation", ""),
+        "generation": generation,
         "documents": final_state.get("documents", []),
-        "tool_used": final_state.get("tool_used", "corpus"),
+        "tool_used": tool_used,
         "retry_count": final_state.get("retry_count", 0),
-        "grade": final_state.get("grade", ""),
+        "grade": grade,
         "latency_ms": elapsed,
     }

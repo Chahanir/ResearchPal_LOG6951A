@@ -17,7 +17,7 @@ ollama
 python-dotenv
 langgraph
 langgraph-checkpoint-sqlite
-duckduckgo-search
+ddgs
 arize-phoenix
 openinference-instrumentation-langchain
 opentelemetry-sdk

@@ -1,5 +1,9 @@
 from __future__ import annotations
 
+import os
+import sys
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
 import json
 import time
 from pathlib import Path
@@ -30,6 +34,8 @@ def run_full_evaluation():
     questions, answers, contexts, ground_truths = collect_pipeline_outputs(graph)
 
     # Étape 3 : RAGAS
+    from src.evaluation.ragas_eval import configure_ragas_for_ollama
+    configure_ragas_for_ollama()
     ragas_scores = run_ragas_evaluation(questions, answers, contexts, ground_truths)
 
     # Étape 4 : LLM-as-judge

@@ -84,7 +84,10 @@ def search_web(query: str, max_results: int = 3) -> str:
         max_results: Nombre maximum de résultats (défaut : 3).
     """
     try:
-        from duckduckgo_search import DDGS
+        try:
+            from ddgs import DDGS
+        except ImportError:
+            from duckduckgo_search import DDGS  # fallback ancien nom
 
         results = []
         with DDGS() as ddgs:

@@ -17,63 +17,114 @@ def run_ragas_evaluation(
     output_file: str = "ragas_results.json",
 ) -> Dict[str, Any]:
     """
-    Exécute l'évaluation RAGAS sur le dataset fourni.
+    Évalue faithfulness et answer_relevancy via des appels LLM séquentiels directs.
 
-    Args:
-        questions: Liste des questions.
-        answers: Réponses générées par le pipeline agentique.
-        contexts: Liste de listes de passages récupérés (un par question).
-        ground_truths: Réponses de référence.
-        output_file: Nom du fichier de sortie JSON.
+    Implémentation manuelle des métriques RAGAS pour contourner l'infrastructure
+    async de RAGAS qui cause des timeouts avec Ollama/llama3.2.
 
-    Returns:
-        Dictionnaire des scores moyens {metric: score}.
+    - faithfulness     : la réponse est-elle fondée sur le contexte fourni ? (0 ou 1)
+    - answer_relevancy : la réponse répond-elle à la question posée ? (0 ou 1)
     """
-    try:
-        from ragas import evaluate
-        from ragas.metrics import faithfulness, answer_relevancy
-        from datasets import Dataset
-    except ImportError:
-        print("⚠️  RAGAS non installé. Exécuter : pip install ragas datasets")
-        return {}
+    from langchain_core.messages import HumanMessage
+    from src.llm_factory import get_llm
 
-    print(f"\n🔬 Évaluation RAGAS sur {len(questions)} paires...")
+    llm = get_llm()
+    print(f"\n🔬 Évaluation RAGAS (séquentielle) sur {len(questions)} paires...")
 
-    # Construire le dataset HuggingFace
-    data = {
-        "question": questions,
-        "answer": answers,
-        "contexts": contexts,
-        "ground_truth": ground_truths,
-    }
-    dataset = Dataset.from_dict(data)
+    FAITH_PROMPT = """Tu es un évaluateur expert en qualité de réponses RAG.
 
-    # Calcul des métriques
+Évalue si la réponse suivante est UNIQUEMENT fondée sur le contexte fourni (faithfulness).
+Réponds UNIQUEMENT avec un JSON strict sans aucun texte avant ou après :
+{{"faithfulness": <0 ou 1>, "reason": "<explication courte>"}}
+
+0 = la réponse contient des affirmations non présentes dans le contexte (hallucination)
+1 = toutes les affirmations de la réponse sont supportées par le contexte
+
+Contexte :
+{context}
+
+Question : {question}
+Réponse : {answer}"""
+
+    RELEVANCY_PROMPT = """Tu es un évaluateur expert en qualité de réponses RAG.
+
+Évalue si la réponse répond bien à la question posée (answer_relevancy).
+Réponds UNIQUEMENT avec un JSON strict sans aucun texte avant ou après :
+{{"answer_relevancy": <0 ou 1>, "reason": "<explication courte>"}}
+
+0 = la réponse ne répond pas à la question ou est hors sujet
+1 = la réponse répond directement et complètement à la question
+
+Question : {question}
+Réponse : {answer}"""
+
+    per_question = []
+    faith_scores = []
+    relevancy_scores = []
     start = time.perf_counter()
-    result = evaluate(
-        dataset=dataset,
-        metrics=[faithfulness, answer_relevancy],
-    )
+
+    for i, (q, a, ctx, gt) in enumerate(zip(questions, answers, contexts, ground_truths)):
+        print(f"  [{i+1}/{len(questions)}] Q{i+1}...", end=" ", flush=True)
+
+        context_str = "\n\n".join([
+            f"[Passage {j+1}]: {c[:400]}" for j, c in enumerate(ctx[:3])
+        ])
+
+        # ── Faithfulness ──────────────────────────────────────────────────
+        faith, faith_reason = 0, "Erreur LLM"
+        try:
+            resp = llm.invoke([HumanMessage(content=FAITH_PROMPT.format(
+                context=context_str, question=q, answer=a[:600]
+            ))])
+            content = resp.content.strip()
+            if "{" in content:
+                parsed = json.loads(content[content.index("{"):content.rindex("}")+1])
+                faith = int(parsed.get("faithfulness", 0))
+                faith_reason = parsed.get("reason", "")
+        except Exception as e:
+            faith_reason = str(e)[:80]
+
+        # ── Answer relevancy ──────────────────────────────────────────────
+        relevancy, relevancy_reason = 0, "Erreur LLM"
+        try:
+            resp = llm.invoke([HumanMessage(content=RELEVANCY_PROMPT.format(
+                question=q, answer=a[:600]
+            ))])
+            content = resp.content.strip()
+            if "{" in content:
+                parsed = json.loads(content[content.index("{"):content.rindex("}")+1])
+                relevancy = int(parsed.get("answer_relevancy", 0))
+                relevancy_reason = parsed.get("reason", "")
+        except Exception as e:
+            relevancy_reason = str(e)[:80]
+
+        faith_scores.append(faith)
+        relevancy_scores.append(relevancy)
+        per_question.append({
+            "id": f"Q{i+1}",
+            "question": q[:80],
+            "faithfulness": faith,
+            "faith_reason": faith_reason,
+            "answer_relevancy": relevancy,
+            "relevancy_reason": relevancy_reason,
+        })
+        print(f"faith={faith} | relevancy={relevancy}")
+
     elapsed = time.perf_counter() - start
 
     scores = {
-        "faithfulness": float(result["faithfulness"]),
-        "answer_relevancy": float(result["answer_relevancy"]),
+        "faithfulness":      round(sum(faith_scores) / max(len(faith_scores), 1), 3),
+        "answer_relevancy":  round(sum(relevancy_scores) / max(len(relevancy_scores), 1), 3),
         "evaluation_time_s": round(elapsed, 2),
-        "n_pairs": len(questions),
+        "n_pairs":           len(questions),
     }
 
-    # Sauvegarde
     output_path = EVAL_OUTPUT_DIR / output_file
     with open(output_path, "w", encoding="utf-8") as f:
-        json.dump({
-            "scores": scores,
-            "per_question": result.to_pandas().to_dict(orient="records"),
-        }, f, ensure_ascii=False, indent=2)
+        json.dump({"scores": scores, "per_question": per_question}, f, ensure_ascii=False, indent=2)
 
     print(f"✅ Résultats sauvegardés dans {output_path}")
     _print_ragas_table(scores)
-
     return scores
 
 
@@ -90,7 +141,7 @@ def _print_ragas_table(scores: Dict[str, Any]) -> None:
 def collect_pipeline_outputs(graph=None) -> tuple:
     """
     Exécute le pipeline agentique sur toutes les paires du dataset
-    et collecte les outputs pour l'évaluation RAGAS.
+    et collecte les outputs pour l'évaluation.
 
     Returns:
         Tuple (questions, answers, contexts, ground_truths)
@@ -129,37 +180,12 @@ def collect_pipeline_outputs(graph=None) -> tuple:
     return questions, answers, contexts, ground_truths
 
 
+def configure_ragas_for_ollama():
+    """Conservé pour compatibilité — l'évaluation est maintenant séquentielle."""
+    print("✅ Évaluation séquentielle activée (pas de dépendance OpenAI)")
+    return True
+
+
 if __name__ == "__main__":
     q, a, c, gt = collect_pipeline_outputs()
     run_ragas_evaluation(q, a, c, gt)
-
-
-def configure_ragas_for_ollama():
-    """
-    Configure RAGAS pour utiliser Ollama (llama3.2) au lieu d'OpenAI.
-    RAGAS nécessite une configuration explicite du LLM d'évaluation.
-
-    IMPORTANT : appeler cette fonction AVANT run_ragas_evaluation().
-    """
-    try:
-        from ragas.llms import LangchainLLMWrapper
-        from ragas.embeddings import LangchainEmbeddingsWrapper
-        from ragas import evaluate
-        from src.llm_factory import get_llm, get_embeddings
-
-        llm_wrapper = LangchainLLMWrapper(get_llm())
-        emb_wrapper = LangchainEmbeddingsWrapper(get_embeddings())
-
-        # Injecter dans les métriques RAGAS
-        from ragas.metrics import faithfulness, answer_relevancy
-        faithfulness.llm = llm_wrapper
-        faithfulness.embeddings = emb_wrapper
-        answer_relevancy.llm = llm_wrapper
-        answer_relevancy.embeddings = emb_wrapper
-
-        print("✅ RAGAS configuré pour Ollama (llama3.2)")
-        return True
-    except Exception as e:
-        print(f"⚠️  Configuration RAGAS/Ollama échouée : {e}")
-        print("   → Assurez-vous qu'Ollama est démarré et que llama3.2 est disponible")
-        return False
