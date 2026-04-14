@@ -3,6 +3,7 @@
 **LOG6951A — Travail pratique 2 — Hiver 2026**  
 Taha-Chahine HAMITOUCHE — 2118576  
 Félix PAILLÉ DOWELL - 2256243
+
 Chargé de cours : Simon Barrette
 
 ---
