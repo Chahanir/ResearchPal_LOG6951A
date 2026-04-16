@@ -40,7 +40,7 @@ ollama pull llama3.2
 
 ```bash
 unzip ResearchPal_LOG6951A.zip
-cd ResearchPal_LOG6951A.zip
+cd ResearchPal_LOG6951A
 ```
 
 ### 2. Créer et activer un environnement virtuel
